@@ -5,12 +5,12 @@ const Footer: React.FC = () => {
     <footer className="bg-gray-50 text-gray-400 text-sm py-6 relative">
       <div className="max-w-7xl mx-auto px-4 text-center space-y-2">
         <p>
-          상호명. 주식회사 원아이컴퍼니 대표, 이종훈 전화. 1577-9637 주소, 부산
-          부산진구 신암로 141 부산기독교방송국건물 5층
+          상호명. 주식회사 APEX 대표, 윤성민 대표. 0000-0000 주소, 서울특별시
+          서대문구 가좌로 134 (홍은동) APEX 2F
         </p>
         <p>
-          사업자등록번호, 575-87-01601 [사업자정보확인] 통신판매업번호,
-          2020-부산부산진-0913 개인정보관리책임자, 이종훈 cheat-key@naver.com
+          사업자등록번호, 000-00-0000 [사업자정보확인] 통신판매업번호,
+          0000-00000-0000 개인정보관리책임자, 윤성민 naruoto42@naver.com
         </p>
         <div className="flex justify-center space-x-4">
           <a href="#">About</a>
@@ -31,12 +31,6 @@ const Footer: React.FC = () => {
           className="w-12 h-12 flex items-center justify-center rounded-full shadow-lg bg-yellow-400"
         >
           <span className="text-black font-bold">TALK</span>
-        </a>
-        <a
-          href="#"
-          className="w-12 h-12 flex items-center justify-center rounded-full shadow-lg bg-green-500"
-        >
-          <span className="text-white font-bold">Chat</span>
         </a>
         <button className="w-12 h-12 flex items-center justify-center rounded-full shadow-lg bg-white">
           <span className="text-gray-500">︾</span>

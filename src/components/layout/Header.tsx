@@ -1,13 +1,17 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   return (
     <header className="w-full border-b bg-white shadow-sm">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between py-4 px-8">
         {/* 로고 */}
-        <div className="text-2xl font-extrabold tracking-wide text-gray-900 cursor-pointer hover:text-black transition-colors">
+        <Link
+          to="/"
+          className="text-2xl font-extrabold tracking-wide text-gray-900 cursor-pointer hover:text-black transition-colors"
+        >
           APEX
-        </div>
+        </Link>
 
         {/* 네비게이션 */}
         <nav className="flex space-x-6 text-sm font-medium text-gray-700">
@@ -39,9 +43,9 @@ const Header: React.FC = () => {
 
         {/* 오른쪽 메뉴 */}
         <div className="flex items-center space-x-5 text-sm font-medium text-gray-500">
-          <a href="#" className="hover:text-black transition-colors">
+          <Link to="/login" className="hover:text-black transition-colors">
             Log-in
-          </a>
+          </Link>
           <a href="#" className="hover:text-black transition-colors">
             Order
           </a>

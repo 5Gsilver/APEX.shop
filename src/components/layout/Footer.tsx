@@ -19,8 +19,7 @@ const Footer: React.FC = () => {
           <a href="#">개인정보처리방침</a>
         </div>
         <p className="text-xs">
-          Copyright. 주식회사 원아이컴퍼니 all rights reserved. Designed By
-          ONEDESIGN.
+          Copyright. 주식회사 APEX all rights reserved. Designed By SM.
         </p>
       </div>
 

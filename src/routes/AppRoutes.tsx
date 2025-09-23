@@ -13,7 +13,7 @@ import OrderConfirmation from "../pages/OrderConfirmation";
 
 // account
 import Login from "../pages/account/Login";
-import Register from "../pages/account/Register";
+import Register from "../pages/account/signup";
 import Profile from "../pages/account/Profile";
 
 const AppRoutes: React.FC = () => {

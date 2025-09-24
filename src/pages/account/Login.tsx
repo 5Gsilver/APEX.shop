@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // 추가
+import { Link } from "react-router-dom"; // Link로 변경
 
 const LoginPage: React.FC = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberId, setRememberId] = useState(false);
-
-  const navigate = useNavigate(); // useNavigate 훅
 
   const handleLogin = () => {
     console.log(
@@ -85,24 +83,15 @@ const LoginPage: React.FC = () => {
         </button>
 
         <div className="flex justify-between text-sm text-gray-500 mt-4">
-          <span
-            className="cursor-pointer hover:underline"
-            onClick={() => navigate("/find-id")} // 아이디 찾기 페이지로 이동
-          >
+          <Link to="/find-id" className="cursor-pointer hover:underline">
             아이디 찾기
-          </span>
-          <span
-            className="cursor-pointer hover:underline"
-            onClick={() => navigate("/find-password")} // 비밀번호 찾기 페이지로 이동
-          >
+          </Link>
+          <Link to="/find-password" className="cursor-pointer hover:underline">
             비밀번호 찾기
-          </span>
-          <span
-            className="cursor-pointer hover:underline"
-            onClick={() => navigate("/signup")} // 회원가입 페이지로 이동
-          >
+          </Link>
+          <Link to="/signup" className="cursor-pointer hover:underline">
             회원가입
-          </span>
+          </Link>
         </div>
       </div>
     </div>

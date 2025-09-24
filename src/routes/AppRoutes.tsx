@@ -1,7 +1,7 @@
 // src/routes/AppRoutes.tsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Layout from "../components/layout/layout"; // 경로/대소문자 확인
+import Layout from "../components/layout/layout";
 
 // pages
 import Home from "../pages/Home";
@@ -15,10 +15,13 @@ import OrderConfirmation from "../pages/OrderConfirmation";
 import Login from "../pages/account/Login";
 import Register from "../pages/account/signup";
 import Profile from "../pages/account/Profile";
+import FindIdPage from "../pages/account/find-id";
+import FindPasswordPage from "../pages/account/find-password";
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      {/* main */}
       <Route
         path="/"
         element={
@@ -90,6 +93,22 @@ const AppRoutes: React.FC = () => {
         element={
           <Layout>
             <Profile />
+          </Layout>
+        }
+      />
+      <Route
+        path="/find-id"
+        element={
+          <Layout>
+            <FindIdPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/find-password"
+        element={
+          <Layout>
+            <FindPasswordPage />
           </Layout>
         }
       />

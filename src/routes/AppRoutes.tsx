@@ -17,6 +17,7 @@ import Register from "../pages/account/signup";
 import Profile from "../pages/account/Profile";
 import FindIdPage from "../pages/account/find-id";
 import FindPasswordPage from "../pages/account/find-password";
+import SignupPage from "../pages/account/signup";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -112,6 +113,14 @@ const AppRoutes: React.FC = () => {
           </Layout>
         }
       />
+			<Route
+				path="/signup"
+				element={
+					<Layout>
+						<SignupPage />
+					</Layout>
+				}
+			/>
     </Routes>
   );
 };

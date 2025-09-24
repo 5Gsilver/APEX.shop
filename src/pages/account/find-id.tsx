@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 const FindId: React.FC = () => {
-  const [memberType, setMemberType] = useState("개인회원");
   const [searchType, setSearchType] = useState("email"); // email | phone
   const [name, setName] = useState("");
   const [emailOrPhone, setEmailOrPhone] = useState("");
@@ -9,7 +8,6 @@ const FindId: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
-      memberType,
       searchType,
       name,
       emailOrPhone,

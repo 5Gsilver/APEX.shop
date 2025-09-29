@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const SignUp: React.FC = () => {
@@ -13,14 +13,24 @@ const SignUp: React.FC = () => {
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
 
+  // 주소 입력값 상태
+  const [postcode, setPostcode] = useState("");
+  const [addr1, setAddr1] = useState("");
+  const [addr2, setAddr2] = useState("");
+
+  // 우편번호 레이어 상태 및 탭
+  const [showZipLayer, setShowZipLayer] = useState(false);
+  const [activeTab, setActiveTab] = useState<"kakao" | "zboo">("kakao");
+  const zipInputRef = useRef<HTMLInputElement>(null);
+  const addr1InputRef = useRef<HTMLInputElement>(null);
+  const addr2InputRef = useRef<HTMLInputElement>(null);
+
   // 유효성 검사 함수
   const validate = () => {
-    // 아이디: 영문소문자/숫자, 4~16자
     if (!/^[a-z0-9]{4,16}$/.test(userId)) {
       setError("아이디는 영문소문자/숫자, 4~16자로 입력해주세요.");
       return false;
     }
-    // 비밀번호: 영문 대소문자/숫자/특수문자 중 2가지 이상 조합, 8~16자
     const pw = password;
     const pwLength = pw.length >= 8 && pw.length <= 16;
     const hasLetter = /[a-zA-Z]/.test(pw);
@@ -41,12 +51,10 @@ const SignUp: React.FC = () => {
       setError("이름을 입력해주세요.");
       return false;
     }
-    // 휴대전화: 3칸 모두 입력
     if (!phone2.trim() || !phone3.trim()) {
       setError("휴대전화번호를 입력해주세요.");
       return false;
     }
-    // 이메일: @ 포함
     if (!email.includes("@")) {
       setError("이메일 형식이 올바르지 않습니다");
       return false;
@@ -63,6 +71,91 @@ const SignUp: React.FC = () => {
     }
     setIsValid(true);
     alert("회원가입이 완료되었습니다!");
+  };
+
+  // 우편번호 레이어 닫기
+  const handleCloseZipLayer = () => setShowZipLayer(false);
+
+  // 카카오 우편번호 서비스 연동
+  const handleOpenZipLayer = () => {
+    setShowZipLayer(true);
+    setActiveTab("kakao");
+    setTimeout(() => {
+      // @ts-ignore
+      if (window.daum && window.daum.Postcode) {
+        // @ts-ignore
+        new window.daum.Postcode({
+          oncomplete: function (data: any) {
+            setPostcode(data.zonecode);
+            setAddr1(data.address);
+            if (zipInputRef.current) zipInputRef.current.value = data.zonecode;
+            if (addr1InputRef.current)
+              addr1InputRef.current.value = data.address;
+            setShowZipLayer(false);
+          },
+          width: "100%",
+          height: "100%",
+        }).embed(document.getElementById("kakaoSearchLayer"));
+      }
+    }, 100);
+  };
+
+  // 탭 전환
+  const handleTabClick = (tab: "kakao" | "zboo") => {
+    setActiveTab(tab);
+    if (tab === "kakao") {
+      setTimeout(() => {
+        // @ts-ignore
+        if (window.daum && window.daum.Postcode) {
+          // @ts-ignore
+          new window.daum.Postcode({
+            oncomplete: function (data: any) {
+              setPostcode(data.zonecode);
+              setAddr1(data.address);
+              if (zipInputRef.current)
+                zipInputRef.current.value = data.zonecode;
+              if (addr1InputRef.current)
+                addr1InputRef.current.value = data.address;
+              setShowZipLayer(false);
+            },
+            width: "100%",
+            height: "100%",
+          }).embed(document.getElementById("kakaoSearchLayer"));
+        }
+      }, 100);
+    }
+  };
+
+  // 카카오 우편번호 스크립트, Cafe24 CSS 동적 로드
+  React.useEffect(() => {
+    if (!document.getElementById("daum-postcode-script")) {
+      const script = document.createElement("script");
+      script.id = "daum-postcode-script";
+      script.src =
+        "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    if (!document.getElementById("cafe24-postcode-css")) {
+      const link = document.createElement("link");
+      link.id = "cafe24-postcode-css";
+      link.rel = "stylesheet";
+      link.type = "text/css";
+      link.href = "//img.echosting.cafe24.com/css/postcode.css";
+      document.head.appendChild(link);
+    }
+  }, []);
+
+  // 지번/도로명 검색 탭의 검색 버튼 클릭 핸들러 (실제 검색 기능은 구현 필요)
+  const handleZbooSearch = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // 실제 검색 기능은 별도 API 필요, 여기서는 안내 메시지만 표시
+    const panel = document.getElementById("zboo_panel_address");
+    const empty = document.getElementById("zboo_panel_empty");
+    if (panel && empty) {
+      panel.innerHTML = `<tr><td colspan="2">검색 기능은 데모입니다.</td></tr>`;
+      empty.style.display = "none";
+    }
   };
 
   return (
@@ -129,8 +222,15 @@ const SignUp: React.FC = () => {
                     type="text"
                     placeholder="우편번호"
                     className="border rounded px-3 py-2 flex-1"
+                    ref={zipInputRef}
+                    value={postcode}
+                    readOnly
                   />
-                  <button className="px-3 py-2 bg-gray-200 rounded">
+                  <button
+                    type="button"
+                    className="px-3 py-2 bg-gray-200 rounded"
+                    onClick={handleOpenZipLayer}
+                  >
                     우편번호 찾기
                   </button>
                 </div>
@@ -138,11 +238,17 @@ const SignUp: React.FC = () => {
                   type="text"
                   placeholder="기본주소"
                   className="w-full border rounded px-3 py-2"
+                  ref={addr1InputRef}
+                  value={addr1}
+                  readOnly
                 />
                 <input
                   type="text"
                   placeholder="나머지주소"
                   className="w-full border rounded px-3 py-2"
+                  ref={addr2InputRef}
+                  value={addr2}
+                  onChange={(e) => setAddr2(e.target.value)}
                 />
               </td>
             </tr>
@@ -182,13 +288,13 @@ const SignUp: React.FC = () => {
                     <option value="018">018</option>
                     <option value="019">019</option>
                     <option value="0508">0508</option>
-                  </select>{" "}
-                  -{" "}
+                  </select>
+                  <span className="mx-1">-</span>
                   <input
                     type="text"
                     className="border rounded px-2 py-2 w-20"
-                  />{" "}
-                  -{" "}
+                  />
+                  <span className="mx-1">-</span>
                   <input
                     type="text"
                     className="border rounded px-2 py-2 w-20"
@@ -211,15 +317,15 @@ const SignUp: React.FC = () => {
                     <option value="017">017</option>
                     <option value="018">018</option>
                     <option value="019">019</option>
-                  </select>{" "}
-                  -{" "}
+                  </select>
+                  <span className="mx-1">-</span>
                   <input
                     type="text"
                     className="border rounded px-2 py-2 w-20"
                     value={phone2}
                     onChange={(e) => setPhone2(e.target.value)}
-                  />{" "}
-                  -{" "}
+                  />
+                  <span className="mx-1">-</span>
                   <input
                     type="text"
                     className="border rounded px-2 py-2 w-20"
@@ -336,6 +442,195 @@ const SignUp: React.FC = () => {
           </button>
         )}
       </div>
+
+      {/* 우편번호 레이어 */}
+      {showZipLayer && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 z-[1000] flex items-center justify-center">
+          <div className="relative bg-white rounded-lg shadow-lg w-[600px] max-w-[95vw] p-0 z-[1001] ">
+            {/* 레이어 내부는 relative 유지 */}
+            <div
+              className="mCafe24Post gPc typeLayer relative"
+              id="layerZipcode"
+            >
+              <h1 className="text-lg font-bold px-6 py-4 border-b">
+                우편번호 검색
+              </h1>
+              <div className="content px-6 py-4">
+                <div className="mTab typeNav eTab mb-4">
+                  <ul className="flex border-b">
+                    <li
+                      className={
+                        activeTab === "kakao"
+                          ? "selected border-b-2 border-black"
+                          : ""
+                      }
+                    >
+                      <a
+                        href="#"
+                        id="kakao_postcode"
+                        className={`inline-block px-4 py-2 ${activeTab === "kakao" ? "font-bold text-black" : "text-gray-500"}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleTabClick("kakao");
+                        }}
+                      >
+                        통합 검색
+                      </a>
+                    </li>
+                    <li
+                      className={
+                        activeTab === "zboo"
+                          ? "selected border-b-2 border-black"
+                          : ""
+                      }
+                    >
+                      <a
+                        href="#"
+                        className={`inline-block px-4 py-2 ${activeTab === "zboo" ? "font-bold text-black" : "text-gray-500"}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleTabClick("zboo");
+                        }}
+                      >
+                        지번/도로명 검색
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                {/* 카카오 우편번호 */}
+                {activeTab === "kakao" && (
+                  <div
+                    id="kakaoSearchLayer"
+                    className="w-full"
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      height: 500,
+                    }}
+                  ></div>
+                )}
+                {/* 지번/도로명 검색 */}
+                {activeTab === "zboo" && (
+                  <div className="search w-[560px] mx-auto">
+                    <table className="w-full border mb-2">
+                      <caption className="sr-only">
+                        동(읍/면) + 지번 검색
+                      </caption>
+                      <tbody>
+                        <tr>
+                          <th
+                            scope="row"
+                            className="text-left px-2 py-1 w-32 bg-gray-50"
+                          >
+                            지번/도로명
+                          </th>
+                          <td className="px-2 py-1">
+                            <input
+                              type="text"
+                              className="fText border rounded px-2 py-1"
+                              id="zboo_keyword"
+                            />
+                            <a
+                              href="#none"
+                              id="zboo_search_btn"
+                              className="btnSearch ml-2 align-middle"
+                              onClick={handleZbooSearch}
+                            >
+                              <img
+                                src="//img.echosting.cafe24.com/postcode/ko_KR/btn_postcode_search.gif"
+                                alt="검색"
+                                className="inline"
+                              />
+                            </a>
+                            <p className="txtInfo text-xs text-gray-500 mt-1">
+                              도로명+건물번호(예:테헤란로5) |
+                              읍/면/동/리+지번(예:서린동154)
+                            </p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div
+                      className="tabCont"
+                      id="zboo_contents"
+                      style={{ display: "block", height: 415 }}
+                    >
+                      <div className="ctrl" id="zboo_panel_sido"></div>
+                      <p
+                        id="similar_search_info"
+                        className="txtInfo"
+                        style={{
+                          display: "none",
+                          color: "#6292db",
+                          marginLeft: 7,
+                          paddingLeft: 11,
+                          background:
+                            "url(//img.echosting.cafe24.com/postcode/sflex_ico.png) no-repeat -443px -96px",
+                        }}
+                      >
+                        일치하는 주소가 없어요. 입력하신 검색어와 가장 유사한
+                        주소 결과를 제공해 드릴게요.
+                      </p>
+                      <div
+                        className="addressList"
+                        id="zboo_panel_search_result"
+                        style={{ height: 365 }}
+                      >
+                        <div className="resultList">
+                          <table className="w-full border">
+                            <caption className="sr-only">
+                              지번주소 검색결과
+                            </caption>
+                            <colgroup>
+                              <col style={{ width: "auto" }} />
+                              <col style={{ width: 60 }} />
+                            </colgroup>
+                            <thead>
+                              <tr>
+                                <th scope="col" className="bg-gray-50">
+                                  상세주소
+                                </th>
+                                <th scope="col" className="bg-gray-50">
+                                  우편번호
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody
+                              id="zboo_panel_address"
+                              className="center"
+                            ></tbody>
+                          </table>
+                        </div>
+                        <p
+                          id="zboo_panel_empty"
+                          className="empty text-center text-gray-400 py-4"
+                          style={{ display: "block" }}
+                        >
+                          찾으실 지번주소 혹은 도로명주소를 검색해 주세요
+                        </p>
+                      </div>
+                      <div id="zboo_paginate" className="paginate"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div
+                className="btnClose absolute top-2 right-2"
+                id={
+                  activeTab === "zboo" ? "zboo_top_close_btn" : "top_close_btn"
+                }
+              >
+                <a href="#none" onClick={handleCloseZipLayer}>
+                  <img
+                    src="//img.echosting.cafe24.com/postcode/btn_close.gif"
+                    alt="닫기"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 };

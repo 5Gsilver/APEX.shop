@@ -446,7 +446,7 @@ const SignUp: React.FC = () => {
       {/* 우편번호 레이어 */}
       {showZipLayer && (
         <div className="fixed inset-0 bg-black bg-opacity-30 z-[1000] flex items-center justify-center">
-          <div className="relative bg-white rounded-lg shadow-lg w-[600px] max-w-[95vw] p-0 z-[1001] ">
+          <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-[95vw] p-0 z-[1001] ">
             {/* 레이어 내부는 relative 유지 */}
             <div
               className="mCafe24Post gPc typeLayer relative"
